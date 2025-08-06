@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuadrado Seguidor del Cursor</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+        }
+        
+        .game-container {
+            position: relative;
+            border: 3px solid #fff;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        canvas {
+            display: block;
+            background: #000;
+        }
+        
+        .instructions {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: white;
+            background: rgba(0,0,0,0.7);
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            max-width: 300px;
+        }
+        
+        .score {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: white;
+            background: rgba(0,0,0,0.7);
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+        <div class="instructions">
+            <strong>Instrucciones:</strong><br>
+            • Mueve el cursor para dirigir el cuadrado<br>
+            • El cuadrado seguirá la dirección del cursor<br>
+            • Evita los obstáculos rojos<br>
+            • Recolecta los puntos verdes
+        </div>
+        <div class="score">
+            Puntos: <span id="score">0</span>
+        </div>
+    </div>
+    <script src="game.js"></script>
+</body>
+</html> 
