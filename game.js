@@ -8,36 +8,114 @@ class Game {
         this.score = 0;
         this.gameOver = false;
         
+        // Responsive canvas setup
+        this.setupCanvas();
+        
         // Player square
         this.player = {
             x: this.canvas.width / 2,
             y: this.canvas.height / 2,
-            size: 20,
-            speed: 3,
+            size: Math.max(20, this.canvas.width * 0.03), // Responsive size
+            speed: Math.max(3, this.canvas.width * 0.005), // Responsive speed
             color: '#00ffff'
         };
         
-        // Mouse position
-        this.mouse = {
-            x: 0,
-            y: 0
+        // Touch/mouse position
+        this.target = {
+            x: this.canvas.width / 2,
+            y: this.canvas.height / 2
         };
         
         // Game objects
         this.obstacles = [];
         this.points = [];
         
+        // Touch state
+        this.isTouching = false;
+        
         // Initialize
         this.init();
         this.gameLoop();
+        
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            this.setupCanvas();
+            this.resizeGameObjects();
+        });
+    }
+    
+    setupCanvas() {
+        const container = this.canvas.parentElement;
+        const rect = container.getBoundingClientRect();
+        
+        // Set canvas size to match container
+        this.canvas.width = rect.width;
+        this.canvas.height = rect.height;
+        
+        // Update player size and speed based on new canvas size
+        if (this.player) {
+            this.player.size = Math.max(20, this.canvas.width * 0.03);
+            this.player.speed = Math.max(3, this.canvas.width * 0.005);
+        }
+        
+        // Ensure target position is within bounds
+        if (this.target) {
+            this.target.x = Math.min(Math.max(0, this.target.x), this.canvas.width);
+            this.target.y = Math.min(Math.max(0, this.target.y), this.canvas.height);
+        }
+    }
+    
+    resizeGameObjects() {
+        // Regenerate obstacles and points for new canvas size
+        this.generateObstacles();
+        this.generatePoints();
+        
+        // Update player position to center
+        this.player.x = this.canvas.width / 2;
+        this.player.y = this.canvas.height / 2;
+        this.target.x = this.player.x;
+        this.target.y = this.player.y;
     }
     
     init() {
-        // Mouse event listeners
+        // Touch events for mobile
+        this.canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            this.isTouching = true;
+            this.updateTargetPosition(e);
+        });
+        
+        this.canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            if (this.isTouching) {
+                this.updateTargetPosition(e);
+            }
+        });
+        
+        this.canvas.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            this.isTouching = false;
+        });
+        
+        // Mouse events for desktop (fallback)
+        this.canvas.addEventListener('mousedown', (e) => {
+            this.isTouching = true;
+            this.updateTargetPosition(e);
+        });
+        
         this.canvas.addEventListener('mousemove', (e) => {
-            const rect = this.canvas.getBoundingClientRect();
-            this.mouse.x = e.clientX - rect.left;
-            this.mouse.y = e.clientY - rect.top;
+            if (this.isTouching) {
+                this.updateTargetPosition(e);
+            }
+        });
+        
+        this.canvas.addEventListener('mouseup', (e) => {
+            this.isTouching = false;
+        });
+        
+        // Prevent context menu on right click
+        this.canvas.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
         });
         
         // Generate initial obstacles and points
@@ -45,14 +123,40 @@ class Game {
         this.generatePoints();
     }
     
+    updateTargetPosition(event) {
+        const rect = this.canvas.getBoundingClientRect();
+        const scaleX = this.canvas.width / rect.width;
+        const scaleY = this.canvas.height / rect.height;
+        
+        let clientX, clientY;
+        
+        if (event.touches && event.touches[0]) {
+            // Touch event
+            clientX = event.touches[0].clientX;
+            clientY = event.touches[0].clientY;
+        } else {
+            // Mouse event
+            clientX = event.clientX;
+            clientY = event.clientY;
+        }
+        
+        this.target.x = (clientX - rect.left) * scaleX;
+        this.target.y = (clientY - rect.top) * scaleY;
+    }
+    
     generateObstacles() {
         this.obstacles = [];
-        for (let i = 0; i < 8; i++) {
+        const numObstacles = Math.max(6, Math.floor(this.canvas.width * this.canvas.height / 50000));
+        
+        for (let i = 0; i < numObstacles; i++) {
+            const minSize = Math.max(30, this.canvas.width * 0.05);
+            const maxSize = Math.max(80, this.canvas.width * 0.15);
+            
             this.obstacles.push({
-                x: Math.random() * (this.canvas.width - 40),
-                y: Math.random() * (this.canvas.height - 40),
-                width: 40 + Math.random() * 60,
-                height: 40 + Math.random() * 60,
+                x: Math.random() * (this.canvas.width - maxSize),
+                y: Math.random() * (this.canvas.height - maxSize),
+                width: minSize + Math.random() * (maxSize - minSize),
+                height: minSize + Math.random() * (maxSize - minSize),
                 color: '#ff4444'
             });
         }
@@ -60,11 +164,15 @@ class Game {
     
     generatePoints() {
         this.points = [];
-        for (let i = 0; i < 5; i++) {
+        const numPoints = Math.max(3, Math.floor(this.canvas.width * this.canvas.height / 40000));
+        
+        for (let i = 0; i < numPoints; i++) {
+            const pointSize = Math.max(12, this.canvas.width * 0.02);
+            
             this.points.push({
-                x: Math.random() * (this.canvas.width - 20),
-                y: Math.random() * (this.canvas.height - 20),
-                size: 15,
+                x: Math.random() * (this.canvas.width - pointSize),
+                y: Math.random() * (this.canvas.height - pointSize),
+                size: pointSize,
                 color: '#44ff44',
                 collected: false
             });
@@ -74,14 +182,14 @@ class Game {
     updatePlayer() {
         if (this.gameOver) return;
         
-        // Calculate direction from player to mouse
-        const dx = this.mouse.x - this.player.x;
-        const dy = this.mouse.y - this.player.y;
+        // Calculate direction from player to target
+        const dx = this.target.x - this.player.x;
+        const dy = this.target.y - this.player.y;
         
         // Calculate distance
         const distance = Math.sqrt(dx * dx + dy * dy);
         
-        // Only move if mouse is not too close (prevents jittering)
+        // Only move if target is not too close (prevents jittering)
         if (distance > 5) {
             // Normalize direction and apply speed
             const dirX = dx / distance;
@@ -159,12 +267,14 @@ class Game {
         );
         
         // Draw direction line (optional visual aid)
-        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-        this.ctx.lineWidth = 2;
-        this.ctx.beginPath();
-        this.ctx.moveTo(this.player.x, this.player.y);
-        this.ctx.lineTo(this.mouse.x, this.mouse.y);
-        this.ctx.stroke();
+        if (this.isTouching) {
+            this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+            this.ctx.lineWidth = Math.max(2, this.canvas.width * 0.003);
+            this.ctx.beginPath();
+            this.ctx.moveTo(this.player.x, this.player.y);
+            this.ctx.lineTo(this.target.x, this.target.y);
+            this.ctx.stroke();
+        }
         
         // Game over screen
         if (this.gameOver) {
@@ -172,15 +282,18 @@ class Game {
             this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
             
             this.ctx.fillStyle = '#ffffff';
-            this.ctx.font = '48px Arial';
+            const fontSize = Math.max(24, this.canvas.width * 0.04);
+            this.ctx.font = `${fontSize}px Arial`;
             this.ctx.textAlign = 'center';
             this.ctx.fillText('¡Juego Terminado!', this.canvas.width / 2, this.canvas.height / 2 - 50);
             
-            this.ctx.font = '24px Arial';
+            const scoreFontSize = Math.max(16, this.canvas.width * 0.025);
+            this.ctx.font = `${scoreFontSize}px Arial`;
             this.ctx.fillText(`Puntuación: ${this.score}`, this.canvas.width / 2, this.canvas.height / 2);
             
-            this.ctx.font = '18px Arial';
-            this.ctx.fillText('Recarga la página para jugar de nuevo', this.canvas.width / 2, this.canvas.height / 2 + 50);
+            const restartFontSize = Math.max(12, this.canvas.width * 0.02);
+            this.ctx.font = `${restartFontSize}px Arial`;
+            this.ctx.fillText('Toca la pantalla para reiniciar', this.canvas.width / 2, this.canvas.height / 2 + 50);
         }
     }
     
@@ -190,9 +303,38 @@ class Game {
         this.draw();
         requestAnimationFrame(() => this.gameLoop());
     }
+    
+    resetGame() {
+        this.score = 0;
+        this.gameOver = false;
+        this.scoreElement.textContent = this.score;
+        this.player.x = this.canvas.width / 2;
+        this.player.y = this.canvas.height / 2;
+        this.target.x = this.player.x;
+        this.target.y = this.player.y;
+        this.generateObstacles();
+        this.generatePoints();
+    }
 }
 
 // Start the game when the page loads
 window.addEventListener('load', () => {
-    new Game();
+    // Small delay to ensure proper canvas sizing
+    setTimeout(() => {
+        const game = new Game();
+        
+        // Add restart functionality
+        game.canvas.addEventListener('click', (e) => {
+            if (game.gameOver) {
+                game.resetGame();
+            }
+        });
+        
+        game.canvas.addEventListener('touchstart', (e) => {
+            if (game.gameOver) {
+                e.preventDefault();
+                game.resetGame();
+            }
+        });
+    }, 100);
 }); 
