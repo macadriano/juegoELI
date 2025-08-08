@@ -19,10 +19,10 @@
             overflow: hidden;
             position: fixed;
             width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
         
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -74,6 +74,7 @@
             max-width: 250px;
             z-index: 10;
             pointer-events: none;
+            backdrop-filter: blur(5px);
         }
         
         .score {
@@ -88,6 +89,7 @@
             font-weight: bold;
             z-index: 10;
             pointer-events: none;
+            backdrop-filter: blur(5px);
         }
         
         .mobile-controls {
@@ -103,6 +105,21 @@
             text-align: center;
             z-index: 10;
             pointer-events: none;
+            backdrop-filter: blur(5px);
+        }
+        
+        .device-indicator {
+            position: absolute;
+            top: 50px;
+            right: 10px;
+            color: white;
+            background: rgba(0,0,0,0.6);
+            padding: 8px;
+            border-radius: 6px;
+            font-size: 10px;
+            z-index: 10;
+            pointer-events: none;
+            backdrop-filter: blur(5px);
         }
         
         /* Mobile-specific styles */
@@ -122,6 +139,11 @@
                 font-size: 12px;
                 padding: 12px;
             }
+            
+            .device-indicator {
+                font-size: 9px;
+                padding: 6px;
+            }
         }
         
         @media (max-width: 480px) {
@@ -139,6 +161,18 @@
             .mobile-controls {
                 font-size: 11px;
                 padding: 10px;
+            }
+            
+            .device-indicator {
+                font-size: 8px;
+                padding: 5px;
+            }
+        }
+        
+        /* Hide device indicator on larger screens */
+        @media (min-width: 769px) {
+            .device-indicator {
+                display: none;
             }
         }
     </style>
@@ -158,6 +192,9 @@
         </div>
         <div class="mobile-controls">
             Toca y arrastra para mover
+        </div>
+        <div class="device-indicator" id="deviceIndicator">
+            Modo Móvil
         </div>
     </div>
     <script src="game.js"></script>

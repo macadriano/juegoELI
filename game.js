@@ -3,20 +3,29 @@ class Game {
         this.canvas = document.getElementById('gameCanvas');
         this.ctx = this.canvas.getContext('2d');
         this.scoreElement = document.getElementById('score');
+        this.deviceIndicator = document.getElementById('deviceIndicator');
         
         // Game state
         this.score = 0;
         this.gameOver = false;
         
+        // Device detection
+        this.isMobile = this.detectMobile();
+        
+        // Update device indicator
+        if (this.deviceIndicator) {
+            this.deviceIndicator.textContent = this.isMobile ? 'Modo Móvil' : 'Modo PC';
+        }
+        
         // Responsive canvas setup
         this.setupCanvas();
         
-        // Player square
+        // Player square - fixed sizes for better gameplay
         this.player = {
             x: this.canvas.width / 2,
             y: this.canvas.height / 2,
-            size: Math.max(20, this.canvas.width * 0.03), // Responsive size
-            speed: Math.max(3, this.canvas.width * 0.005), // Responsive speed
+            size: this.isMobile ? 25 : 20, // Fixed size based on device
+            speed: this.isMobile ? 4 : 3, // Fixed speed based on device
             color: '#00ffff'
         };
         
@@ -44,6 +53,11 @@ class Game {
         });
     }
     
+    detectMobile() {
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+               (window.innerWidth <= 768);
+    }
+    
     setupCanvas() {
         const container = this.canvas.parentElement;
         const rect = container.getBoundingClientRect();
@@ -51,12 +65,6 @@ class Game {
         // Set canvas size to match container
         this.canvas.width = rect.width;
         this.canvas.height = rect.height;
-        
-        // Update player size and speed based on new canvas size
-        if (this.player) {
-            this.player.size = Math.max(20, this.canvas.width * 0.03);
-            this.player.speed = Math.max(3, this.canvas.width * 0.005);
-        }
         
         // Ensure target position is within bounds
         if (this.target) {
@@ -146,11 +154,14 @@ class Game {
     
     generateObstacles() {
         this.obstacles = [];
-        const numObstacles = Math.max(6, Math.floor(this.canvas.width * this.canvas.height / 50000));
+        
+        // Fixed number of obstacles based on device type
+        const numObstacles = this.isMobile ? 8 : 12;
         
         for (let i = 0; i < numObstacles; i++) {
-            const minSize = Math.max(30, this.canvas.width * 0.05);
-            const maxSize = Math.max(80, this.canvas.width * 0.15);
+            // Fixed sizes for better gameplay
+            const minSize = this.isMobile ? 40 : 35;
+            const maxSize = this.isMobile ? 70 : 60;
             
             this.obstacles.push({
                 x: Math.random() * (this.canvas.width - maxSize),
@@ -164,10 +175,13 @@ class Game {
     
     generatePoints() {
         this.points = [];
-        const numPoints = Math.max(3, Math.floor(this.canvas.width * this.canvas.height / 40000));
+        
+        // Fixed number of points based on device type
+        const numPoints = this.isMobile ? 5 : 8;
         
         for (let i = 0; i < numPoints; i++) {
-            const pointSize = Math.max(12, this.canvas.width * 0.02);
+            // Fixed size for better gameplay
+            const pointSize = this.isMobile ? 15 : 12;
             
             this.points.push({
                 x: Math.random() * (this.canvas.width - pointSize),
@@ -269,7 +283,7 @@ class Game {
         // Draw direction line (optional visual aid)
         if (this.isTouching) {
             this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-            this.ctx.lineWidth = Math.max(2, this.canvas.width * 0.003);
+            this.ctx.lineWidth = 2;
             this.ctx.beginPath();
             this.ctx.moveTo(this.player.x, this.player.y);
             this.ctx.lineTo(this.target.x, this.target.y);
@@ -282,16 +296,16 @@ class Game {
             this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
             
             this.ctx.fillStyle = '#ffffff';
-            const fontSize = Math.max(24, this.canvas.width * 0.04);
+            const fontSize = this.isMobile ? 28 : 32;
             this.ctx.font = `${fontSize}px Arial`;
             this.ctx.textAlign = 'center';
             this.ctx.fillText('¡Juego Terminado!', this.canvas.width / 2, this.canvas.height / 2 - 50);
             
-            const scoreFontSize = Math.max(16, this.canvas.width * 0.025);
+            const scoreFontSize = this.isMobile ? 20 : 24;
             this.ctx.font = `${scoreFontSize}px Arial`;
             this.ctx.fillText(`Puntuación: ${this.score}`, this.canvas.width / 2, this.canvas.height / 2);
             
-            const restartFontSize = Math.max(12, this.canvas.width * 0.02);
+            const restartFontSize = this.isMobile ? 16 : 18;
             this.ctx.font = `${restartFontSize}px Arial`;
             this.ctx.fillText('Toca la pantalla para reiniciar', this.canvas.width / 2, this.canvas.height / 2 + 50);
         }

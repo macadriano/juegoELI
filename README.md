@@ -1,84 +1,65 @@
-# Cuadrado Seguidor del Cursor
+# Cuadrado Seguidor del Cursor - Juego Adaptativo
 
-Un juego simple donde un cuadrado azul sigue la dirección del cursor del mouse. Disponible en dos versiones: JavaScript (HTML5) y Python (Pygame).
+Un juego simple donde controlas un cuadrado que sigue tu cursor o dedo, evitando obstáculos y recolectando puntos.
 
-## Versión Python (Pygame)
+## Características
 
-### Requisitos
-- Python 3.6 o superior
-- Pygame
+### 🎮 Gameplay
+- **Control intuitivo**: El cuadrado sigue tu cursor (PC) o dedo (móvil)
+- **Obstáculos dinámicos**: Evita los cuadrados rojos
+- **Sistema de puntos**: Recolecta los círculos verdes para ganar puntos
+- **Detección de colisiones**: Juego termina al tocar un obstáculo
 
-### Instalación
-1. Instala las dependencias:
-```bash
-pip install -r requirements.txt
-```
+### 📱 Adaptabilidad Multiplataforma
+- **Detección automática de dispositivo**: Se adapta automáticamente entre móvil y PC
+- **Tamaños optimizados**: 
+  - **Móvil**: Cuadrado jugador más grande (25px), velocidad moderada (4)
+  - **PC**: Cuadrado jugador estándar (20px), velocidad normal (3)
+- **Cantidad de elementos balanceada**:
+  - **Móvil**: 8 obstáculos, 5 puntos
+  - **PC**: 12 obstáculos, 8 puntos
+- **Interfaz responsiva**: Se ajusta a cualquier tamaño de pantalla
 
-2. Ejecuta el juego:
-```bash
-python game.py
-```
+### 🎯 Mejoras Implementadas
+- **Tamaños fijos**: Eliminados los cálculos porcentuales que causaban objetos muy grandes en PCs
+- **Velocidades apropiadas**: Diferentes velocidades según el dispositivo
+- **Mejor experiencia móvil**: Controles táctiles optimizados
+- **Indicador de modo**: Muestra si está en modo móvil o PC
+- **Interfaz mejorada**: Efectos de blur y mejor legibilidad
 
-### Controles (Python)
-- **Mouse**: Mueve el cursor para dirigir el cuadrado
-- **R**: Reiniciar juego (cuando termina)
-- **ESC**: Salir del juego
+## Cómo Jugar
 
-## Versión JavaScript (HTML5)
+### En PC:
+1. Haz clic y arrastra el mouse para mover el cuadrado
+2. Evita los obstáculos rojos
+3. Recolecta los puntos verdes
 
-### Cómo jugar
-1. Abre el archivo `index.html` en tu navegador web
-2. Mueve el cursor del mouse para dirigir el cuadrado azul
-3. El cuadrado se moverá automáticamente hacia donde apunta el cursor
-4. Recolecta los puntos verdes para ganar puntos
-5. Evita tocar los obstáculos rojos
-6. ¡Intenta conseguir la mayor puntuación posible!
+### En Móvil:
+1. Toca y arrastra tu dedo por la pantalla
+2. El cuadrado seguirá tu dedo
+3. Evita los obstáculos rojos
+4. Recolecta los puntos verdes
 
-### Controles (JavaScript)
-- **Mouse**: Mueve el cursor para dirigir el cuadrado
-- **No se requieren teclas**: Todo se controla con el mouse
+## Instalación
 
-## Características (Ambas versiones)
+1. Descarga todos los archivos
+2. Abre `index.html` en tu navegador
+3. ¡Disfruta del juego!
 
-- **Cuadrado seguidor**: El cuadrado azul sigue la dirección del cursor
-- **Sistema de puntuación**: Recolecta puntos verdes para ganar puntos
-- **Obstáculos**: Evita los rectángulos rojos
-- **Interfaz moderna**: Diseño atractivo con gradientes y efectos visuales
-- **Línea de dirección**: Una línea semitransparente muestra la dirección del movimiento
+## Compatibilidad
 
-## Archivos del proyecto
+- ✅ Navegadores modernos (Chrome, Firefox, Safari, Edge)
+- ✅ Dispositivos móviles (Android, iOS)
+- ✅ Tablets
+- ✅ PCs de escritorio
 
-### Versión Python
-- `game.py` - Juego principal en Python con Pygame
-- `requirements.txt` - Dependencias de Python
+## Tecnologías
 
-### Versión JavaScript
-- `index.html` - Archivo principal HTML con la estructura y estilos
-- `game.js` - Lógica del juego en JavaScript
-
-### Documentación
-- `README.md` - Este archivo de documentación
-
-## Tecnologías utilizadas
-
-### Versión Python
-- Python 3.6+
-- Pygame 2.5.2
-
-### Versión JavaScript
 - HTML5 Canvas
 - JavaScript ES6+
-- CSS3 con gradientes y efectos visuales
+- CSS3 con media queries
+- Detección de dispositivos móviles
 
-## Cómo ejecutar
+## Versión
 
-### Python
-```bash
-pip install -r requirements.txt
-python game.py
-```
-
-### JavaScript
-Simplemente abre el archivo `index.html` en cualquier navegador web moderno. No se requieren servidores adicionales ni dependencias externas.
-
-¡Disfruta del juego en tu versión preferida! 
+v2.0 - Versión adaptativa multiplataforma 
